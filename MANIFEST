@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Webdriver.pm
+lib/Webdriver/Agent.pm
+lib/Webdriver/Browser.pm
+lib/Webdriver/Component.pm
+lib/Webdriver/Element.pm
+lib/Webdriver/Server.pm
+lib/Webdriver/Window.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod.t
