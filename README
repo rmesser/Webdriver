@@ -1,7 +1,9 @@
-Webdriver
+WEBDRIVER
 
-Webdriver - A Perl module used to communicate with and send commands to a WebDriver server, such
-as selenium or chromedriver.  See http://code.google.com/p/selenium/wiki/JsonWireProtocol.
+Webdriver - A set of Perl modules used to communicate with and send commands to a WebDriver
+server, such as selenium or chromedriver.
+
+See http://code.google.com/p/selenium/wiki/JsonWireProtocol for the details on the protocol.
 
 See the examples directory for usage.  Here also is a small example usage:
 
@@ -10,11 +12,13 @@ See the examples directory for usage.  Here also is a small example usage:
 
     use Webdriver::Server;
 
+    # first get a server object.  If connecting to a remote host like a selenium server,
+    # then "host" is required, but for local connections all you need to provide is the port.
     my $wd_server = Webdriver::Server->new( port => 9515 );
     my $browser = $wd_server->get_new_browser();
     $browser->set_url('http://wikipedia.org');
     
-    # do a query by simulating type with a return at the end
+    # do a query by sending keys with a return at the end
     $browser->set_keys("testing\n");
     
     # now find the first result and print its text
@@ -30,42 +34,72 @@ To install this module, run the following commands:
 	./Build test
 	./Build install
 
-LICENSE AND COPYRIGHT
+DOCUMENTATION
 
-Copyright (C) 2013 IntelliSurvey, Inc.
+For now the documentation is mainly in the code, other than this blurb.  See for example
+Webdriver::Browser for the methods you can call on a browser object, or Webdriver::Window
+for the methods available for that object.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
+Note that this module mainly implements the JSON wire protocol as-is, by adopting simple
+naming and argument passing conventions as follows:
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+  1. For each GET command, map to get_$command.  For example, there is GET /url command,
+     so we have a get_url.
+     
+  2. For each POST command that takes arguments, map to set_$command.  For example, there
+     is a POST /url that accepts a url as input, so we have a set_url method here.
+     
+  3. If the POST command accepts no inputs, name it by the command alone.  For example,
+     /back is a POST without any inputs, so we have a 'back' method here for that.
+     
+  4. If the command has slashes, like timeouts/async_script, change those to underscores,
+     so that becomes set_timeouts_async_script.
+     
+  5. Expect named args in the format defined in the spec.  However, if there is only one
+     named arg, we instead accept that input by position as the first and only input.For
+     example, for set_url, the input defined in the spec is {url => $url}, but since there
+     is only one input, we allow simply $session->set_url('http://foo.com').
+     
+  6. For each DELETE command, map to delete_$command.
+  
+  7. For the commands that expect a sequence of keys as an aref, instead accept a normal
+     string and automatically convert that to an aref.  Make the method that accepts the
+     aref a private method, with the same name but a leading underscore.
 
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
+Exceptions such as 'get_capabilities' and 'close' are needed because the command urls are
+empty, so we choose descriptive names not necessarily based on the spec. 
 
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
+Also, we do have several "helper" methods that don't map exactly to commands in the spec:
 
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
+ - find_element: return a Webdriver::Element object.  Takes the same inputs as get_element,
+   namely "using" and "value".  find_element is a method for both the browser object and
+   an Webdriver::Element (to find an element within that element.)
 
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
+ - find_elements -- the same as find_element, but returns a list of Webdriver::Element
+   objects.
 
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ - get_window -- get a Webdriver::Window object for the current window.
+
+ - get_windows -- get a list of Webdriver::Window objects, one for each window available
+   in this session.
+
+ - get_attribute -- get the value of an element's attribute.  Takes an input attribute name.
+
+ - get_css_property -- query the value of an element's computed CSS property.  Takes the
+   property name as input.
+
+TODO AND ROADMAP
+ 
+Next steps:
+
+  - Add more helper methods.  It takes extra lines of code to always get an element, then
+    act on it.  So it would be easier to just do $browser->click('#element_id') for example,
+    instead of the current way, which is:
+    $browser->find_element(using => 'css selector, value => '#element_id')->click();
+    
+  - Default to 'css selector' as the "using" value for find_element and new helper methods,
+    but provide a way to use xpath and other element search methods as well.
+    
+  - Add a test package, similar in concept to Test::WWW::Selenium perhaps.
+  
+  - Better docs
