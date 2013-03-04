@@ -65,16 +65,14 @@ has '+agent' => (
     }
 );
 
-
 ## now define methods that don't work via the handles hash.
 
 #==
-# set_value
+# send_keys
 #
-# The spec says callers must pass keys as an aref, but that's pretty awkward.  So _set_value
-# is a private method and this public version does the conversion to an aref.
+# Send a set of keystrokes to this element.
 #==
-sub set_value {
+sub send_keys {
     my ( $self, $string ) = @_;
 
     $self->_set_value( [ split '', $string ] );
@@ -90,7 +88,7 @@ sub set_value {
 sub get_attribute {
     my ( $self, $attr ) = @_;
 
-    return $self->get_request_data( 'GET', "/attribute/$attr" );
+    return $self->get_request_data( 'GET', "attribute/$attr" );
 }
 
 #==
@@ -101,7 +99,7 @@ sub get_attribute {
 sub get_css_property {
     my ( $self, $prop ) = @_;
 
-    return $self->get_request_data( 'GET', "/css/$prop" );
+    return $self->get_request_data( 'GET', "css/$prop" );
 }
 
 __PACKAGE__->meta->make_immutable;

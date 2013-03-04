@@ -56,7 +56,7 @@ naming and argument passing conventions as follows:
      so that becomes set_timeouts_async_script.
      
   5. Expect named args in the format defined in the spec.  However, if there is only one
-     named arg, we instead accept that input by position as the first and only input.For
+     named arg, we instead accept that input by position as the first and only input.  For
      example, for set_url, the input defined in the spec is {url => $url}, but since there
      is only one input, we allow simply $session->set_url('http://foo.com').
      

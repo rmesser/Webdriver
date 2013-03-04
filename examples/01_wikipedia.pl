@@ -7,7 +7,7 @@ use warnings;
 #
 # This assumes a webdriver server or selenium server is running somewhere.
 
-use Test::More tests => 4;
+use Test::More tests => 6;
 
 use Webdriver::Server;
 
@@ -26,12 +26,22 @@ $browser->set_url('http://wikipedia.org');
 
 is( $browser->get_title, "Wikipedia", "title test" );
 
-$browser->set_keys("testing\n");
+$browser->send_keys("testing\n");
 
 my $element = $browser->find_element( using => 'css selector', value => 'li' );
 ok( $element->isa('Webdriver::Element'), "element created" );
 
 # note the below could change if wikipedia search results change
 like( $element->get_text, qr/assessment/i, "element text match" );
+
+# then click the first anchor tag that has a "Test" title
+$browser->click_element('a[title~="Test"]');
+
+# verify that the H1 text includes "assessment"
+like( $browser->get_element_text('h1'), qr/assessment/, "h1 tag text");
+
+# and the same test again, this time using one of the testing helper methods
+use Webdriver::Browser::Test;
+$browser->element_text_like('h1', qr/assessment/);
 
 $browser->close;

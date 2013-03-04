@@ -24,6 +24,7 @@ has 'port' => (
     is       => 'ro',
     isa      => 'Int',
     required => 1,
+    default  => 4444,    # the typical selenium port
 );
 
 has 'host' => (
@@ -47,7 +48,7 @@ has 'base_url' => (
 # now the server that controls a browser can either be a Selenium server, or just a browser driver
 # like chromedriver or phantomjs with ghostdriver.  The user can pass in this indicator, or if not
 # set we'll send a test request to /wd/hub, the starting point for the Selenium server.  If we get an
-# OK response we assume we're talking to selenium.
+# OK response we know we're talking to selenium.
 has 'is_selenium' => (
     isa       => 'Bool',
     reader    => 'is_selenium',
@@ -104,7 +105,7 @@ sub _test_for_selenium {
 # @param {hash} byname
 # @param {href} .desiredCapabilities (optional) the list of capabilities needed, as defined in spec.
 # @param {href} .requiredCapabilities (optional) the list of capabilities needed, as defined in spec.
-# @return {Webdriver::Browser} a browser session object
+# @param {Webdriver::Browser} a browser session object
 #==
 sub get_new_browser {
     my ( $self, %params ) = @_;

@@ -12,11 +12,11 @@ See http://code.google.com/p/selenium/wiki/JsonWireProtocol.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
@@ -34,7 +34,7 @@ See the examples directory for usage.  Here also is a small example usage:
     $browser->set_url('http://wikipedia.org');
     
     # do a query by simulating type with a return at the end
-    $browser->set_keys("testing\n");
+    $browser->send_keys("testing\n");
     
     # now find the first result and print its text
     my $element = $browser->find_element(
@@ -42,6 +42,9 @@ See the examples directory for usage.  Here also is a small example usage:
         value => 'li'
     );
     print $element->get_text;
+    
+    # or the same thing with more direct method
+    print $browser->get_element_text('li');
     
 =head1 LICENSE AND COPYRIGHT
 

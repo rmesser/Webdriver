@@ -22,6 +22,7 @@ my $builder = Module::Build->new(
         'Try::Tiny'            => 0.11,
         'namespace::autoclean' => 0.13,
         'MooseX::FollowPBP'    => 0.05,
+        'Test::More'           => 0.98,
     },
     add_to_cleanup     => [ 'Webdriver-*' ],
     create_makefile_pl => 'traditional',
